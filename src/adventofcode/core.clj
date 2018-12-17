@@ -96,3 +96,34 @@
   "I don't do a whole lot."
   [x]
   (println x "Hello, World!"))
+
+(defn sum-node-meta [s]
+  (let [[num-children num-meta & remaining] s]
+    (let [s (reduce ())])
+    (reduce +
+            (take num-meta s)
+            (reduce ))))
+
+(defn read-node [s]
+  (let [[num-children num-meta & remaining] s
+        [children remaining] (loop [children []
+                                    remaining remaining
+                                    num-children-read 0]
+                               (if (= num-children-read num-children)
+                                 [children remaining]
+                                 (let [[child next-remaining] (read-node remaining)]
+                                   (recur (conj children child)
+                                          next-remaining
+                                          (inc num-children-read)))))
+        metadata (take num-meta remaining)]
+    [{:children children :metadata metadata} (drop num-meta remaining)]))
+
+(defn day8-part1 []
+  (let [input (map #(Integer/parseInt %) (string/split (slurp (io/resource "day8_input")) #" "))]
+    (clojure.walk/postwalk (fn [tree]
+                             (if (:metadata tree)
+                               (apply + (concat (:metadata tree) (:children tree)))
+                               tree))
+                           (read-node input))))
+
+(day8-part1)
