@@ -79,31 +79,6 @@
 
 (day3-part2)
 
-(defn parse-guard-times []
-  (let [input (string/split (slurp (io/resource "day4_input")) #"\n")]
-    (reduce (fn [stats line]
-              (if (re-match #"Guard #(\d+) begins shift")
-                ;; discard the day, we don't care
-                (assoc stats )
-                ))
-            {:current-guard nil
-             :sleep-times {}}
-            input)))
-
-(defn day4-part1 []
-  )
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
-
-(defn sum-node-meta [s]
-  (let [[num-children num-meta & remaining] s]
-    (let [s (reduce ())])
-    (reduce +
-            (take num-meta s)
-            (reduce ))))
-
 (defn read-node [s]
   (let [[num-children num-meta & remaining] s
         children-and-remaining (take num-children (rest (iterate (fn [[_ remaining]]
