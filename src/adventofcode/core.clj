@@ -106,15 +106,11 @@
 
 (defn read-node [s]
   (let [[num-children num-meta & remaining] s
-        [children remaining] (loop [children []
-                                    remaining remaining
-                                    num-children-read 0]
-                               (if (= num-children-read num-children)
-                                 [children remaining]
-                                 (let [[child next-remaining] (read-node remaining)]
-                                   (recur (conj children child)
-                                          next-remaining
-                                          (inc num-children-read)))))
+        children-and-remaining (take num-children (rest (iterate (fn [[_ remaining]]
+                                                                   (read-node remaining))
+                                                                 [nil remaining])))
+        children (map first children-and-remaining)
+        remaining (if (zero? num-children) remaining (last (last children-and-remaining)))
         metadata (take num-meta remaining)]
     [{:children children :metadata metadata} (drop num-meta remaining)]))
 
@@ -126,4 +122,17 @@
                                tree))
                            (read-node input))))
 
+(defn node-value [node]
+  (if (empty? (:children node))
+    (reduce + (:metadata node))
+    (let [referenced-children (remove nil? (map #(get (:children node) (dec %)) (:metadata node)))]
+      (reduce + (map node-value referenced-children)))))
+
+(defn day8-part2 []
+  (let [input (map #(Integer/parseInt %) (string/split (slurp (io/resource "day8_input")) #" "))
+        tree (first (read-node input))]
+    (node-value tree)))
+
 (day8-part1)
+
+;; 42146
